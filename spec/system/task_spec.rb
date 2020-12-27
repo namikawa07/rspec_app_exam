@@ -1,15 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Task', type: :system do
-
   let(:project) {create(:project)}
-  
+  let(:task) {create(:task)}
   describe 'Task一覧' do
+    let!(:task) {create(:task)}
     context '正常系' do
-
-      let!(:task) {create(:task, project_id: project.id)}
-
-      it '一覧ページにアクセスした場合、Taskが表示されること' do
+      fit '一覧ページにアクセスした場合、Taskが表示されること' do
         # TODO: ローカル変数ではなく let を使用してください
         visit project_tasks_path(project)
         expect(page).to have_content task.title
@@ -17,7 +14,7 @@ RSpec.describe 'Task', type: :system do
         expect(current_path).to eq project_tasks_path(project)
       end
 
-      it 'Project詳細からTask一覧ページにアクセスした場合、Taskが表示されること' do
+      fit 'Project詳細からTask一覧ページにアクセスした場合、Taskが表示されること' do
         # FIXME: テストが失敗するので修正してください(完了)
         visit project_path(project)
         click_on 'View Todos'
@@ -47,7 +44,6 @@ RSpec.describe 'Task', type: :system do
 
   describe 'Task詳細' do
     context '正常系' do
-      let(:task) {create(:task, project_id: project.id)}
       it 'Taskが表示されること' do
         # TODO: ローカル変数ではなく let を使用してください
         visit project_task_path(project, task)
@@ -60,7 +56,6 @@ RSpec.describe 'Task', type: :system do
   end
 
   describe 'Task編集' do
-    let(:task) {create(:task, project_id: project.id)}
     context '正常系' do
       it 'Taskを編集した場合、一覧画面で編集後の内容が表示されること' do
         # FIXME: テストが失敗するので修正してください(完了)
@@ -68,7 +63,7 @@ RSpec.describe 'Task', type: :system do
         fill_in 'Deadline', with: Time.current
         click_button 'Update Task'
         click_link 'Back'
-        expect(find('.task_list')).to have_content(task.short_time(task.deadline))
+        expect(find('.task_list')).to have_content(short_time(Time.current))
         expect(current_path).to eq project_tasks_path(project)
       end
 
@@ -84,13 +79,13 @@ RSpec.describe 'Task', type: :system do
 
       it '既にステータスが完了のタスクのステータスを変更した場合、Taskの完了日が更新されないこと' do
         # TODO: FactoryBotのtraitを利用してください
-        task = FactoryBot.create(:task, :task_status, :task_completion_date, project_id: project.id)
-        visit edit_project_task_path(project, task)
+        completion_task = create(:task, :task_status, :task_completion_date)
+        visit edit_project_task_path(project, completion_task)
         select 'todo', from: 'Status'
         click_button 'Update Task'
         expect(page).to have_content('todo')
         expect(page).not_to have_content(Time.current.strftime('%Y-%m-%d'))
-        expect(current_path).to eq project_task_path(project, task)
+        expect(current_path).to eq project_task_path(project, completion_task)
       end
     end
   end
@@ -98,8 +93,8 @@ RSpec.describe 'Task', type: :system do
   describe 'Task削除' do
     context '正常系' do
       # FIXME: テストが失敗するので修正してください(完了)
-      let!(:task) {create(:task, project_id: project.id)}
       it 'Taskが削除されること' do
+        task = create(:task)
         visit project_tasks_path(project)
         click_link 'Destroy'
         page.driver.browser.switch_to.alert.accept
