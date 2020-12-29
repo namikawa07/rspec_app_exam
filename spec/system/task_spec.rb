@@ -6,7 +6,7 @@ RSpec.describe 'Task', type: :system do
   describe 'Task一覧' do
     let!(:task) {create(:task)}
     context '正常系' do
-      fit '一覧ページにアクセスした場合、Taskが表示されること' do
+      it '一覧ページにアクセスした場合、Taskが表示されること' do
         # TODO: ローカル変数ではなく let を使用してください
         visit project_tasks_path(project)
         expect(page).to have_content task.title
@@ -14,7 +14,7 @@ RSpec.describe 'Task', type: :system do
         expect(current_path).to eq project_tasks_path(project)
       end
 
-      fit 'Project詳細からTask一覧ページにアクセスした場合、Taskが表示されること' do
+      it 'Project詳細からTask一覧ページにアクセスした場合、Taskが表示されること' do
         # FIXME: テストが失敗するので修正してください(完了)
         visit project_path(project)
         click_on 'View Todos'
@@ -79,7 +79,7 @@ RSpec.describe 'Task', type: :system do
 
       it '既にステータスが完了のタスクのステータスを変更した場合、Taskの完了日が更新されないこと' do
         # TODO: FactoryBotのtraitを利用してください
-        completion_task = create(:task, :task_status, :task_completion_date)
+        completion_task = create(:task, :task_status_done, :task_completion_date)
         visit edit_project_task_path(project, completion_task)
         select 'todo', from: 'Status'
         click_button 'Update Task'
@@ -94,7 +94,7 @@ RSpec.describe 'Task', type: :system do
     context '正常系' do
       # FIXME: テストが失敗するので修正してください(完了)
       it 'Taskが削除されること' do
-        task = create(:task)
+        task = create(:task, title: "Task Destroy")
         visit project_tasks_path(project)
         click_link 'Destroy'
         page.driver.browser.switch_to.alert.accept

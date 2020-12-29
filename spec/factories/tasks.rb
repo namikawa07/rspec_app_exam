@@ -1,13 +1,13 @@
 FactoryBot.define do
   factory :task do
-    sequence(:title) { |n| "Task_#{n}" }
+    title {"Task"}
     status { rand(2) }
     from = Date.parse("2019/08/01")
     to   = Date.parse("2019/12/31")
     deadline { Random.rand(from..to) }
     association :project
 
-    trait :task_status do
+    trait :task_status_done do
       status { :done }
     end
 
